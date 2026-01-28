@@ -6,5 +6,5 @@ pages_build_output_dir = ".vercel/output/static"
 [[d1_databases]]
 binding = "DB"
 database_name = "items-stocker-db"
-database_id = "xaf800df4-3852-4e73-a6b4-947ea2406cc7" # Placeholder
+database_id = "af800df4-3852-4e73-a6b4-947ea2406cc7" # Correct ID without typo
 migrations_dir = "drizzle" # will be managed locally or inserted by user
