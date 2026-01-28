@@ -16,6 +16,8 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+import { Shell } from "@/components/shell";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
-        {children}
+        <Shell>{children}</Shell>
       </body>
     </html>
   );

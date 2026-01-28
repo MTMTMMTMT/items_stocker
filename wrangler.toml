@@ -6,4 +6,5 @@ pages_build_output_dir = ".next"
 [[d1_databases]]
 binding = "DB"
 database_name = "items-stocker-db"
-database_id = "xxxx-xxxx-xxxx-xxxx" # Placeholder, will be managed locally or inserted by user
+database_id = "xxxx-xxxx-xxxx-xxxx" # Placeholder
+migrations_dir = "drizzle", will be managed locally or inserted by user
