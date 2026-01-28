@@ -1,0 +1,9 @@
+name = "items-stocker"
+compatibility_date = "2024-04-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".next"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "items-stocker-db"
+database_id = "xxxx-xxxx-xxxx-xxxx" # Placeholder, will be managed locally or inserted by user
