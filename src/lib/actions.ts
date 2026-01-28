@@ -22,7 +22,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     const parsed = authSchema.safeParse(data);
 
     if (!parsed.success) {
-        return { error: 'Invalid input' };
+        return { error: '入力内容が正しくありません' };
     }
 
     const { username, password } = parsed.data;
@@ -31,7 +31,7 @@ export async function loginAction(prevState: any, formData: FormData) {
     const user = await db.select().from(users).where(eq(users.username, username)).get();
 
     if (!user || !(await verifyPassword(password, user.password_hash))) {
-        return { error: 'Invalid username or password' };
+        return { error: 'ユーザー名またはパスワードが違います' };
     }
 
     await createSession(user.id);
@@ -49,7 +49,7 @@ export async function addItemAction(prevState: any, formData: FormData) {
     const parsed = itemSchema.safeParse(data);
 
     if (!parsed.success) {
-        return { error: 'Invalid input' };
+        return { error: '入力内容が正しくありません' };
     }
 
     const { name, category, is_memo_only } = parsed.data;
@@ -57,7 +57,7 @@ export async function addItemAction(prevState: any, formData: FormData) {
 
     const user = await import('./auth').then(m => m.getSession());
     if (!user) {
-        return { error: 'Unauthorized' };
+        return { error: '認証されていません' };
     }
 
     await db.insert(items).values({
@@ -80,7 +80,7 @@ export async function registerAction(prevState: any, formData: FormData) {
     const parsed = authSchema.safeParse(data);
 
     if (!parsed.success) {
-        return { error: 'Invalid input (min 3 chars username, 6 chars password)' };
+        return { error: '入力内容が正しくありません（ユーザー名は3文字以上、パスワードは6文字以上）' };
     }
 
     const { username, password } = parsed.data;
@@ -88,7 +88,7 @@ export async function registerAction(prevState: any, formData: FormData) {
 
     const existing = await db.select().from(users).where(eq(users.username, username)).get();
     if (existing) {
-        return { error: 'Username already taken' };
+        return { error: 'そのユーザー名は既に使用されています' };
     }
 
     const passwordHash = await hashPassword(password);

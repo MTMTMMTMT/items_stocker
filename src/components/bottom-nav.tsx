@@ -20,7 +20,7 @@ export function BottomNav() {
                     )}
                 >
                     <Home className="h-6 w-6" />
-                    <span className="text-[10px] font-medium">Stock</span>
+                    <span className="text-[10px] font-medium">在庫</span>
                 </Link>
 
                 <Link
@@ -31,7 +31,7 @@ export function BottomNav() {
                     )}
                 >
                     <ShoppingCart className="h-6 w-6" />
-                    <span className="text-[10px] font-medium">Shopping</span>
+                    <span className="text-[10px] font-medium">買い物</span>
                 </Link>
 
                 {/* Placeholder for settings or family switch if not in header */}
@@ -43,7 +43,7 @@ export function BottomNav() {
                     )}
                 >
                     <User className="h-6 w-6" />
-                    <span className="text-[10px] font-medium">Account</span>
+                    <span className="text-[10px] font-medium">設定</span>
                 </Link>
             </div>
         </div>

@@ -23,7 +23,7 @@ const STATUS_COLORS = {
     1: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 hover:bg-yellow-200',
     2: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200',
 };
-const STATUS_LABELS = { 0: 'Plenty', 1: 'Running Low', 2: 'Empty' };
+const STATUS_LABELS = { 0: '在庫あり', 1: '少なめ', 2: 'なし' };
 
 export function ItemList({ initialItems }: { initialItems: Item[] }) {
     const searchParams = useSearchParams();
@@ -70,7 +70,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
     });
 
     const grouped = filteredItems.reduce((acc, item) => {
-        const cat = item.category || 'Uncategorized';
+        const cat = item.category || '未分類';
         if (!acc[cat]) acc[cat] = [];
         acc[cat].push(item);
         return acc;
@@ -141,7 +141,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
             {filteredItems.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-20 text-muted-foreground opacity-50 space-y-2">
                     <Check className="h-10 w-10" />
-                    <p>{view === 'shopping' ? 'Everything is stocked!' : 'No items found.'}</p>
+                    <p>{view === 'shopping' ? '買い物リストは空です！' : 'アイテムが登録されていません。'}</p>
                 </div>
             )}
         </div>

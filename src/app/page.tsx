@@ -28,24 +28,22 @@ export default async function DashboardPage() {
     userItems = await db.select().from(items).where(eq(items.owner_id, user.id)).all();
   }
 
+  // Extract unique categories from items
+  const uniqueCategories = Array.from(new Set(userItems.map(item => item.category).filter(Boolean))) as string[];
+
   return (
     <div className="space-y-4 pb-24"> {/* Added padding for bottom nav */}
-      <header className="flex items-center justify-between py-4 sticky top-0 bg-background/80 backdrop-blur-md z-10 px-4 mt-2 rounded-xl border-b">
-        <h1 className="text-2xl font-bold tracking-tight">
-          My Stock
+      <header className="flex items-center justify-center py-4 sticky top-0 bg-background/80 backdrop-blur-md z-10 px-4 mt-2 rounded-xl border-b">
+        <h1 className="text-xl font-bold tracking-tight">
+          Items Stocker
         </h1>
-        <form action={logoutAction}>
-          <Button variant="ghost" size="icon">
-            <LogOut className="h-5 w-5" />
-          </Button>
-        </form>
       </header>
 
       <div className="px-4">
         <ItemList initialItems={userItems} />
       </div>
 
-      <AddItemDrawer />
+      <AddItemDrawer existingCategories={uniqueCategories} />
     </div>
   );
 }
