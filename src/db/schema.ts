@@ -20,6 +20,7 @@ export const items = sqliteTable('items', {
 
     is_shared: integer('is_shared', { mode: 'boolean' }).default(true),
     is_memo_only: integer('is_memo_only', { mode: 'boolean' }).default(false),
+    should_buy: integer('should_buy', { mode: 'boolean' }).default(true), // If false, never verify for shopping list even if empty
 
     owner_id: text('owner_id'), // if not shared, who owns it
     group_id: text('group_id'), // which group it belongs to

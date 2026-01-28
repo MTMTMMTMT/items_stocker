@@ -3,10 +3,16 @@
 import { useOptimistic, startTransition, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check } from 'lucide-react';
+import { Check, MoreHorizontal, Trash } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { toggleItemStatusAction, checkItemAction } from '@/lib/actions';
+import { toggleItemStatusAction, checkItemAction, deleteItemAction, toggleShouldBuyAction } from '@/lib/actions';
 import { cn } from '@/lib/utils';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Item = {
     id: string;
@@ -16,6 +22,7 @@ type Item = {
     memo: string | null;
     is_memo_only: boolean | null;
     is_shared: boolean | null;
+    should_buy: boolean | null;
 };
 
 // Status Utils
@@ -34,7 +41,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
 
     const [optimisticItems, setOptimisticItems] = useOptimistic(
         initialItems,
-        (state, action: { type: 'updateStatus' | 'checkItem'; itemId: string; newStatus?: number }) => {
+        (state, action: { type: 'updateStatus' | 'checkItem' | 'deleteItem' | 'toggleShouldBuy'; itemId: string; newStatus?: number; newShouldBuy?: boolean }) => {
             switch (action.type) {
                 case 'updateStatus':
                     return state.map(item =>
@@ -48,6 +55,14 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                             ? { ...item, status: 0 }
                             : item
                     );
+                case 'deleteItem':
+                    return state.filter(item => item.id !== action.itemId);
+                case 'toggleShouldBuy':
+                    return state.map(item =>
+                        item.id === action.itemId
+                            ? { ...item, should_buy: action.newShouldBuy! }
+                            : item
+                    );
                 default:
                     return state;
             }
@@ -58,12 +73,9 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
     const displayedItems = optimisticItems.filter(item => {
         // 1. View Mode Filter
         if (view === 'shopping') {
-            // Shopping view: Show if status is Low(1) or Empty(2), OR if it's memo_only (assuming memo_only implies shopping list usage)
-            // BUT: if memo_only item is checked (status 0), it should disappear? 
-            // Current Logic: 
-            // Status 0 (Plenty) -> Hidden usually.
-            // If item.is_memo_only is true, and status is 0... usage implies "Bought". So hide.
             if (item.status === 0) return false;
+            // Hide if stop repurchasing is active (should_buy is false)
+            if (item.should_buy === false) return false;
             return true;
         } else {
             // Stock mode: Show all tracked items (not memo_only)
@@ -77,9 +89,6 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
         ? displayedItems.filter(item => (item.category || '未分類') === filteredCategory)
         : displayedItems;
 
-    // Get all unique categories from the current view's items (or all items? usually better to show all available categories in the global list)
-    // Actually, let's show categories present in the *current view mode* to avoid empty filters, OR all categories.
-    // Let's us all initialItems categories for the filter strip.
     const allCategories = Array.from(new Set(initialItems.map(i => i.category || '未分類')));
 
     const grouped = finalFilteredItems.reduce((acc, item) => {
@@ -101,6 +110,22 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
         startTransition(() => {
             setOptimisticItems({ type: 'checkItem', itemId: item.id });
             checkItemAction(item.id);
+        });
+    };
+
+    const handleDelete = (item: Item) => {
+        if (!confirm('本当に削除しますか？')) return;
+        startTransition(() => {
+            setOptimisticItems({ type: 'deleteItem', itemId: item.id });
+            deleteItemAction(item.id);
+        });
+    };
+
+    const handleToggleShouldBuy = (item: Item) => {
+        const current = item.should_buy !== false;
+        startTransition(() => {
+            setOptimisticItems({ type: 'toggleShouldBuy', itemId: item.id, newShouldBuy: !current });
+            toggleShouldBuyAction(item.id, current);
         });
     };
 
@@ -138,12 +163,22 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                         {items.map(item => (
                             <div
                                 key={item.id}
-                                className="flex items-center justify-between p-3 bg-card rounded-xl shadow-sm border border-border/50"
+                                className={cn(
+                                    "flex items-center justify-between p-3 bg-card rounded-xl shadow-sm border border-border/50 transition-opacity",
+                                    item.should_buy === false && "opacity-60 grayscale"
+                                )}
                             >
-                                <div className="flex-1 min-w-0 mr-2">
-                                    <div className="font-medium text-[16px] truncate">{item.name}</div>
-                                    {item.memo && <div className="text-xs text-muted-foreground truncate">{item.memo}</div>}
-                                    {item.is_shared === false && <Badge variant="outline" className="text-[10px] h-4 px-1 mt-1 text-muted-foreground">自分のみ</Badge>}
+                                <div className="flex items-center flex-1 min-w-0 mr-2 gap-2">
+                                    <div className="min-w-0">
+                                        <div className={cn("font-medium text-[16px] truncate", item.should_buy === false && "line-through decoration-muted-foreground")}>
+                                            {item.name}
+                                        </div>
+                                        {item.memo && <div className="text-xs text-muted-foreground truncate">{item.memo}</div>}
+                                    </div>
+                                    <div className="flex gap-1 flex-wrap shrink-0">
+                                        {item.should_buy === false && <Badge variant="outline" className="text-[10px] h-4 px-1 text-muted-foreground border-dashed">停止中</Badge>}
+                                        {item.is_shared === false && <Badge variant="outline" className="text-[10px] h-4 px-1 text-muted-foreground">自分のみ</Badge>}
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center gap-2 shrink-0">
@@ -168,6 +203,23 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                                             {STATUS_LABELS[item.status as keyof typeof STATUS_LABELS] || 'Unknown'}
                                         </Badge>
                                     )}
+
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                                <MoreHorizontal className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={() => handleToggleShouldBuy(item)}>
+                                                {item.should_buy !== false ? '購入を一時停止' : '購入を再開'}
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleDelete(item)} className="text-red-600 focus:text-red-600">
+                                                <Trash className="mr-2 h-4 w-4" />
+                                                削除
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </div>
                             </div>
                         ))}

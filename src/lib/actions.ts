@@ -15,6 +15,7 @@ const mockGroupId = 'family-group-1'; // Default group for now
 const authSchema = z.object({
     username: z.string().min(3),
     password: z.string().min(6),
+    group_id: z.string().min(1),
 });
 
 export async function loginAction(prevState: any, formData: FormData) {
@@ -25,13 +26,21 @@ export async function loginAction(prevState: any, formData: FormData) {
         return { error: '入力内容が正しくありません' };
     }
 
-    const { username, password } = parsed.data;
+    const { username, password, group_id } = parsed.data;
     const db = await getDb();
 
-    const user = await db.select().from(users).where(eq(users.username, username)).get();
+    // Check username and group_id
+    // Security Note: We should verify both. 
+    const user = await db.select().from(users)
+        .where(eq(users.username, username))
+        .get();
 
     if (!user || !(await verifyPassword(password, user.password_hash))) {
         return { error: 'ユーザー名またはパスワードが違います' };
+    }
+
+    if (user.group_id !== group_id) {
+        return { error: '家族IDが一致しません' };
     }
 
     await createSession(user.id);
@@ -93,15 +102,15 @@ export async function registerAction(prevState: any, formData: FormData) {
     const parsed = authSchema.safeParse(data);
 
     if (!parsed.success) {
-        return { error: '入力内容が正しくありません（ユーザー名は3文字以上、パスワードは6文字以上）' };
+        return { success: false, error: '入力内容が正しくありません（ユーザー名は3文字以上、パスワードは6文字以上）' };
     }
 
-    const { username, password } = parsed.data;
+    const { username, password, group_id } = parsed.data;
     const db = await getDb();
 
     const existing = await db.select().from(users).where(eq(users.username, username)).get();
     if (existing) {
-        return { error: 'そのユーザー名は既に使用されています' };
+        return { success: false, error: 'そのユーザー名は既に使用されています' };
     }
 
     const passwordHash = await hashPassword(password);
@@ -110,11 +119,28 @@ export async function registerAction(prevState: any, formData: FormData) {
     const newUser = await db.insert(users).values({
         username,
         password_hash: passwordHash,
-        group_id: mockGroupId,
+        group_id: group_id, // Use provided group_id
     }).returning({ id: users.id }).get();
 
-    await createSession(newUser.id);
-    redirect('/');
+    // Usually admin creates user, so maybe don't auto-login? 
+    // But for this flow, let's keep it simple. If admin adds, maybe redirect to admin?
+    // User requested: "/admin allows registering new users".
+    // If we redirect to '/', admin loses context. 
+    // Let's NOT login automatically if this is an admin action?
+    // But `registerAction` is currently generic.
+    // Let's create `adminRegisterAction` or modify this to support redirecting back.
+    // However, for now, let's assume this action is used by the Admin Page form.
+    // If I use `redirect` here, it throws Next.js redirection error which is handled by Next.js.
+
+    // Changing behavior: Do NOT login. Return success so UI can show "Created".
+    // await createSession(newUser.id);
+    // redirect('/');
+
+    // Wait, if I change this, the original tests might break if any. But user said "Modify flow".
+
+    const { revalidatePath } = await import('next/cache');
+    revalidatePath('/admin');
+    return { success: true };
 }
 
 export async function toggleItemStatusAction(itemId: string, currentStatus: number) {
@@ -129,6 +155,19 @@ export async function toggleItemStatusAction(itemId: string, currentStatus: numb
 
     await db.update(items)
         .set({ status: nextStatus, updated_by: user.username, updated_at: new Date().toISOString() }) // Use params or sql? drizzle handles date? using string for text column
+        .where(eq(items.id, itemId));
+
+    const { revalidatePath } = await import('next/cache');
+    revalidatePath('/');
+}
+
+export async function toggleShouldBuyAction(itemId: string, currentVal: boolean) {
+    const user = await import('./auth').then(m => m.getSession());
+    if (!user) return { error: 'Unauthorized' };
+
+    const db = await getDb();
+    await db.update(items)
+        .set({ should_buy: !currentVal, updated_by: user.username, updated_at: new Date().toISOString() })
         .where(eq(items.id, itemId));
 
     const { revalidatePath } = await import('next/cache');
@@ -153,4 +192,17 @@ export async function checkItemAction(itemId: string) {
 export async function logoutAction() {
     await logoutAuth();
     redirect('/login');
+}
+
+export async function deleteItemAction(itemId: string) {
+    const user = await import('./auth').then(m => m.getSession());
+    if (!user) return { error: 'Unauthorized' };
+
+    const db = await getDb();
+
+    await db.delete(items).where(eq(items.id, itemId));
+
+    const { revalidatePath } = await import('next/cache');
+    revalidatePath('/');
+    return { success: true };
 }
