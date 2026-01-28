@@ -7,4 +7,4 @@ pages_build_output_dir = ".next"
 binding = "DB"
 database_name = "items-stocker-db"
 database_id = "xxxx-xxxx-xxxx-xxxx" # Placeholder
-migrations_dir = "drizzle", will be managed locally or inserted by user
+migrations_dir = "drizzle" # will be managed locally or inserted by user

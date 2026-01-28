@@ -18,6 +18,8 @@ export const viewport: Viewport = {
 
 import { Shell } from "@/components/shell";
 
+export const runtime = 'edge';
+
 export default function RootLayout({
   children,
 }: Readonly<{
