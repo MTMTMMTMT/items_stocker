@@ -1,11 +1,11 @@
 'use client';
 
-import { useOptimistic, startTransition, useState } from 'react';
+import { startTransition, useOptimistic, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, MoreHorizontal, Trash } from 'lucide-react';
+import { Check, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { toggleItemStatusAction, checkItemAction, deleteItemAction, toggleShouldBuyAction } from '@/lib/actions';
+import { toggleItemStatusAction, checkItemAction, deleteItemAction, toggleShouldBuyAction, updateItemAction } from '@/lib/actions';
 import { cn } from '@/lib/utils';
 import {
     DropdownMenu,
@@ -13,6 +13,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { EditItemDialog } from './edit-item-dialog';
 
 type Item = {
     id: string;
@@ -38,10 +39,18 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
     const view = searchParams.get('view') || 'stock';
 
     const [filteredCategory, setFilteredCategory] = useState<string | null>(null);
+    const [editingItem, setEditingItem] = useState<Item | null>(null);
 
     const [optimisticItems, setOptimisticItems] = useOptimistic(
         initialItems,
-        (state, action: { type: 'updateStatus' | 'checkItem' | 'deleteItem' | 'toggleShouldBuy'; itemId: string; newStatus?: number; newShouldBuy?: boolean }) => {
+        (state, action: {
+            type: 'updateStatus' | 'checkItem' | 'deleteItem' | 'toggleShouldBuy' | 'updateItemNameMemo';
+            itemId: string;
+            newStatus?: number;
+            newShouldBuy?: boolean;
+            newName?: string;
+            newMemo?: string | null;
+        }) => {
             switch (action.type) {
                 case 'updateStatus':
                     return state.map(item =>
@@ -61,6 +70,12 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                     return state.map(item =>
                         item.id === action.itemId
                             ? { ...item, should_buy: action.newShouldBuy! }
+                            : item
+                    );
+                case 'updateItemNameMemo':
+                    return state.map(item =>
+                        item.id === action.itemId
+                            ? { ...item, name: action.newName!, memo: action.newMemo! }
                             : item
                     );
                 default:
@@ -126,6 +141,13 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
         startTransition(() => {
             setOptimisticItems({ type: 'toggleShouldBuy', itemId: item.id, newShouldBuy: !current });
             toggleShouldBuyAction(item.id, current);
+        });
+    };
+
+    const handleUpdateItem = (id: string, name: string, memo: string | null) => {
+        startTransition(() => {
+            setOptimisticItems({ type: 'updateItemNameMemo', itemId: id, newName: name, newMemo: memo });
+            updateItemAction(id, name, memo);
         });
     };
 
@@ -211,6 +233,10 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
+                                            <DropdownMenuItem onClick={() => setEditingItem(item)}>
+                                                <Pencil className="mr-2 h-4 w-4" />
+                                                編集
+                                            </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => handleToggleShouldBuy(item)}>
                                                 {item.should_buy !== false ? '購入を一時停止' : '購入を再開'}
                                             </DropdownMenuItem>
@@ -233,6 +259,13 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                     <p>{view === 'shopping' ? '買い物リストは空です！' : 'アイテムが見つかりません'}</p>
                 </div>
             )}
+
+            <EditItemDialog
+                open={!!editingItem}
+                onOpenChange={(open) => !open && setEditingItem(null)}
+                item={editingItem}
+                onSubmit={handleUpdateItem}
+            />
         </div>
     );
 }

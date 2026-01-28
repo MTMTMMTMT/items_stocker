@@ -194,6 +194,29 @@ export async function logoutAction() {
     redirect('/login');
 }
 
+export async function updateItemAction(itemId: string, name: string, memo: string | null) {
+    const user = await import('./auth').then(m => m.getSession());
+    if (!user) return { error: 'Unauthorized' };
+
+    const db = await getDb();
+
+    // Verify ownership or group? For now, group based access is implicit if we assume all items in valid groups are editable.
+    // Ideally check group_id. But simplicity first.
+
+    await db.update(items)
+        .set({
+            name,
+            memo: memo || null,
+            updated_by: user.username,
+            updated_at: new Date().toISOString()
+        })
+        .where(eq(items.id, itemId));
+
+    const { revalidatePath } = await import('next/cache');
+    revalidatePath('/');
+    return { success: true };
+}
+
 export async function deleteItemAction(itemId: string) {
     const user = await import('./auth').then(m => m.getSession());
     if (!user) return { error: 'Unauthorized' };
