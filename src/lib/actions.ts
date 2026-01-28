@@ -41,7 +41,10 @@ export async function loginAction(prevState: any, formData: FormData) {
 const itemSchema = z.object({
     name: z.string().min(1),
     category: z.string().optional(),
-    is_memo_only: z.string().optional(), // Checkbox returns "true" or undefined
+    memo: z.string().optional(),
+    is_memo_only: z.string().optional(), // Checkbox "true"
+    add_to_shopping_list: z.string().optional(), // New checkbox "true"
+    is_shared: z.string().optional(), // New checkbox "true"
 });
 
 export async function addItemAction(prevState: any, formData: FormData) {
@@ -52,7 +55,7 @@ export async function addItemAction(prevState: any, formData: FormData) {
         return { error: '入力内容が正しくありません' };
     }
 
-    const { name, category, is_memo_only } = parsed.data;
+    const { name, category, memo, is_memo_only, add_to_shopping_list, is_shared } = parsed.data;
     const db = await getDb();
 
     const user = await import('./auth').then(m => m.getSession());
@@ -60,11 +63,21 @@ export async function addItemAction(prevState: any, formData: FormData) {
         return { error: '認証されていません' };
     }
 
+    // specific logic: if "is_memo_only" (one-time), we likely want it in shopping list immediately -> status 2
+    // if "add_to_shopping_list" checked -> status 2
+    // default -> status 0 (Plenty)
+    let initialStatus = 0;
+    if (is_memo_only === 'true' || add_to_shopping_list === 'true') {
+        initialStatus = 2; // Empty/Need to buy
+    }
+
     await db.insert(items).values({
         name,
-        category: category || 'uncategorized',
+        category: category || '未分類',
+        memo: memo || null,
+        status: initialStatus,
+        is_shared: is_shared !== 'false', // Default to true if not specified? Or checkbox logic. Let's assume default checked in UI.
         is_memo_only: is_memo_only === 'true',
-        status: 0, // Plenty by default
         owner_id: user.id,
         group_id: user.group_id,
     });
