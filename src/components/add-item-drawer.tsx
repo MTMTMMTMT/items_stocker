@@ -89,6 +89,10 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                                 ))}
                             </datalist>
                         </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="memo">メモ</Label>
+                            <Input id="memo" name="memo" placeholder="備考や詳細（任意）" />
+                        </div>
                         <div className="flex items-center space-x-2">
                             {/* Checkbox handling in server actions requires 'on' value check */}
                             <Checkbox id="is_memo_only" name="is_memo_only" value="true" />

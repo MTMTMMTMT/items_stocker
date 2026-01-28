@@ -1,0 +1,1 @@
+ALTER TABLE `items` ADD `should_buy` integer DEFAULT true;

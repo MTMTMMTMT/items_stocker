@@ -15,6 +15,13 @@
       "when": 1769595660149,
       "tag": "0001_natural_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1769605578581,
+      "tag": "0002_dapper_randall_flagg",
+      "breakpoints": true
     }
   ]
 }
