@@ -66,12 +66,12 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                 </Button>
             </DrawerTrigger>
             <DrawerContent>
-                <div className="mx-auto w-full max-w-sm">
+                <div className="mx-auto w-full max-w-sm max-h-[85vh] overflow-y-auto">
                     <DrawerHeader>
                         <DrawerTitle>アイテムを追加</DrawerTitle>
                         <DrawerDescription>在庫や買い物リストに新しいアイテムを追加します。</DrawerDescription>
                     </DrawerHeader>
-                    <form onSubmit={handleSubmit} className="p-4 space-y-4">
+                    <form onSubmit={handleSubmit} className="p-4 space-y-4 pb-48">
                         <div className="space-y-2">
                             <Label htmlFor="name">商品名</Label>
                             <Input id="name" name="name" placeholder="例: 牛乳" required />
