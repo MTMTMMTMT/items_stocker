@@ -85,7 +85,7 @@ export function EditItemDialog({ item, open, onOpenChange, onSubmit, existingCat
                                 className="flex-1"
                                 onClick={() => setIsMemoOnly(false)}
                             >
-                                在庫リストに追加
+                                在庫管理に追加
                                 <span className="ml-1 text-[10px] opacity-80">(定番)</span>
                             </Button>
                             <Button
@@ -94,7 +94,7 @@ export function EditItemDialog({ item, open, onOpenChange, onSubmit, existingCat
                                 className="flex-1"
                                 onClick={() => setIsMemoOnly(true)}
                             >
-                                買い物メモ
+                                買い物リストに追加
                                 <span className="ml-1 text-[10px] opacity-80">(今回のみ)</span>
                             </Button>
                         </div>

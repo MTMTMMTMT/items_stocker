@@ -105,15 +105,39 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                             <Label htmlFor="memo">メモ</Label>
                             <Input id="memo" name="memo" placeholder="備考や詳細（任意）" />
                         </div>
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="is_shared" name="is_shared" defaultChecked={true} value="true" />
-                                <Label htmlFor="is_shared">家族と共有する</Label>
+                        <div className="space-y-2">
+                            <Label>アイテムの種類</Label>
+                            <div className="flex gap-2">
+                                <Button
+                                    type="button"
+                                    variant={!isMemoOnly ? "default" : "outline"}
+                                    className="flex-1"
+                                    onClick={() => setIsMemoOnly(false)}
+                                >
+                                    在庫管理に追加
+                                    <span className="ml-1 text-[10px] opacity-80">(定番)</span>
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant={isMemoOnly ? "default" : "outline"}
+                                    className="flex-1"
+                                    onClick={() => setIsMemoOnly(true)}
+                                >
+                                    買い物リストに追加
+                                    <span className="ml-1 text-[10px] opacity-80">(今回のみ)</span>
+                                </Button>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="is_memo_only" name="is_memo_only" value="true" />
-                                <Label htmlFor="is_memo_only">メモのみ（在庫管理しない）</Label>
-                            </div>
+                            <input type="hidden" name="is_memo_only" value={isMemoOnly ? "true" : "false"} />
+                            <p className="text-[10px] text-muted-foreground">
+                                {!isMemoOnly
+                                    ? "在庫として管理します。なくなったら「購入リスト」に入れ、購入後はまた在庫に戻ります。"
+                                    : "今回だけの買い物メモです。購入チェックをするとリストから消えます。"}
+                            </p>
+                        </div>
+
+                        <div className="flex items-center space-x-2">
+                            <Checkbox id="is_shared" name="is_shared" defaultChecked={true} value="true" />
+                            <Label htmlFor="is_shared">家族と共有する</Label>
                         </div>
 
                         <DrawerFooter>
