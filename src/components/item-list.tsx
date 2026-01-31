@@ -52,6 +52,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
             newMemo?: string | null;
             newCategory?: string | null;
             newIsShared?: boolean;
+            newIsMemoOnly?: boolean;
         }) => {
             switch (action.type) {
                 case 'updateStatus':
@@ -82,7 +83,8 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                                 name: action.newName!,
                                 memo: action.newMemo!,
                                 category: action.newCategory!,
-                                is_shared: action.newIsShared!
+                                is_shared: action.newIsShared!,
+                                is_memo_only: action.newIsMemoOnly!
                             }
                             : item
                     );
@@ -112,7 +114,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
         ? displayedItems.filter(item => (item.category || '未分類') === filteredCategory)
         : displayedItems;
 
-    const allCategories = Array.from(new Set(initialItems.map(i => i.category || '未分類')));
+    const allCategories = Array.from(new Set(displayedItems.map(i => i.category || '未分類')));
 
     const grouped = finalFilteredItems.reduce((acc, item) => {
         const cat = item.category || '未分類';
@@ -152,7 +154,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
         });
     };
 
-    const handleUpdateItem = (id: string, name: string, memo: string | null, category: string | null, is_shared: boolean) => {
+    const handleUpdateItem = (id: string, name: string, memo: string | null, category: string | null, is_shared: boolean, is_memo_only: boolean) => {
         startTransition(() => {
             setOptimisticItems({
                 type: 'updateItemFull',
@@ -160,9 +162,10 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                 newName: name,
                 newMemo: memo,
                 newCategory: category,
-                newIsShared: is_shared
+                newIsShared: is_shared,
+                newIsMemoOnly: is_memo_only
             });
-            updateItemAction(id, name, memo, category, is_shared);
+            updateItemAction(id, name, memo, category, is_shared, is_memo_only);
         });
     };
 

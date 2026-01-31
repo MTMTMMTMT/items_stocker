@@ -194,7 +194,7 @@ export async function logoutAction() {
     redirect('/login');
 }
 
-export async function updateItemAction(itemId: string, name: string, memo: string | null, category: string | null, is_shared: boolean) {
+export async function updateItemAction(itemId: string, name: string, memo: string | null, category: string | null, is_shared: boolean, is_memo_only: boolean) {
     const user = await import('./auth').then(m => m.getSession());
     if (!user) return { error: 'Unauthorized' };
 
@@ -206,6 +206,7 @@ export async function updateItemAction(itemId: string, name: string, memo: strin
             memo: memo || null,
             category: category || '未分類',
             is_shared: is_shared,
+            is_memo_only: is_memo_only,
             updated_by: user.username,
             updated_at: new Date().toISOString()
         })

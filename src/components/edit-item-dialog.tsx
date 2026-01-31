@@ -31,7 +31,7 @@ interface EditItemDialogProps {
     item: Item | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onSubmit: (id: string, name: string, memo: string | null, category: string | null, is_shared: boolean) => void;
+    onSubmit: (id: string, name: string, memo: string | null, category: string | null, is_shared: boolean, is_memo_only: boolean) => void;
     existingCategories: string[];
 }
 
@@ -40,6 +40,7 @@ export function EditItemDialog({ item, open, onOpenChange, onSubmit, existingCat
     const [memo, setMemo] = useState("");
     const [category, setCategory] = useState("");
     const [isShared, setIsShared] = useState(true);
+    const [isMemoOnly, setIsMemoOnly] = useState(false);
 
     useEffect(() => {
         if (item) {
@@ -47,13 +48,14 @@ export function EditItemDialog({ item, open, onOpenChange, onSubmit, existingCat
             setMemo(item.memo || "");
             setCategory(item.category || "");
             setIsShared(item.is_shared !== false); // Default logic
+            setIsMemoOnly(item.is_memo_only === true);
         }
     }, [item]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!item) return;
-        onSubmit(item.id, name, memo || null, category || null, isShared);
+        onSubmit(item.id, name, memo || null, category || null, isShared, isMemoOnly);
         onOpenChange(false);
     };
 
@@ -72,6 +74,30 @@ export function EditItemDialog({ item, open, onOpenChange, onSubmit, existingCat
                             onChange={e => setName(e.target.value)}
                             placeholder="商品名"
                         />
+                    </div>
+                    {/* Item Type Selector */}
+                    <div className="space-y-2">
+                        <Label>アイテムの種類</Label>
+                        <div className="flex gap-2">
+                            <Button
+                                type="button"
+                                variant={!isMemoOnly ? "default" : "outline"}
+                                className="flex-1"
+                                onClick={() => setIsMemoOnly(false)}
+                            >
+                                在庫リストに追加
+                                <span className="ml-1 text-[10px] opacity-80">(定番)</span>
+                            </Button>
+                            <Button
+                                type="button"
+                                variant={isMemoOnly ? "default" : "outline"}
+                                className="flex-1"
+                                onClick={() => setIsMemoOnly(true)}
+                            >
+                                買い物メモ
+                                <span className="ml-1 text-[10px] opacity-80">(今回のみ)</span>
+                            </Button>
+                        </div>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="edit-category">カテゴリー</Label>

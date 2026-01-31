@@ -35,6 +35,7 @@ const initialState: ActionState = {
 export function AddItemDrawer({ existingCategories = [] }: { existingCategories?: string[] }) {
     const [open, setOpen] = useState(false);
     const [isPending, setIsPending] = useState(false);
+    const [isMemoOnly, setIsMemoOnly] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
