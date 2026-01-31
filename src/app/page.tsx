@@ -29,7 +29,12 @@ export default async function DashboardPage() {
   }
 
   // Extract unique categories from items
-  const uniqueCategories = Array.from(new Set(userItems.map(item => item.category).filter(Boolean))) as string[];
+  // Exclude "Zombie" items (Memo Only items that are bought/checked, i.e., status === 0)
+  const activeItems = userItems.filter(item => {
+    if (item.is_memo_only && item.status === 0) return false;
+    return true;
+  });
+  const uniqueCategories = Array.from(new Set(activeItems.map(item => item.category).filter(Boolean))) as string[];
 
   return (
     <div className="space-y-4 pb-24"> {/* Added padding for bottom nav */}

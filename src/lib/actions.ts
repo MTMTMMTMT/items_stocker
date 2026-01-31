@@ -181,9 +181,19 @@ export async function checkItemAction(itemId: string) {
 
     const db = await getDb();
 
-    await db.update(items)
-        .set({ status: 0, updated_by: user.username, updated_at: new Date().toISOString() })
-        .where(eq(items.id, itemId));
+    // Fetch item to check if it is memo_only
+    const item = await db.select().from(items).where(eq(items.id, itemId)).get();
+    if (!item) return;
+
+    if (item.is_memo_only) {
+        // If it's a one-time memo, delete it upon check
+        await db.delete(items).where(eq(items.id, itemId));
+    } else {
+        // Normal item: mark as plenty (0)
+        await db.update(items)
+            .set({ status: 0, updated_by: user.username, updated_at: new Date().toISOString() })
+            .where(eq(items.id, itemId));
+    }
 
     const { revalidatePath } = await import('next/cache');
     revalidatePath('/');

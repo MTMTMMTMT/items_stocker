@@ -3,7 +3,7 @@
 import { startTransition, useOptimistic, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, Circle, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { Check, Circle, MoreHorizontal, Pencil, Trash, ShoppingCart } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { toggleItemStatusAction, checkItemAction, deleteItemAction, toggleShouldBuyAction, updateItemAction } from '@/lib/actions';
 import { cn } from '@/lib/utils';
@@ -133,7 +133,11 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
 
     const handleCheckLine = (item: Item) => {
         startTransition(() => {
-            setOptimisticItems({ type: 'checkItem', itemId: item.id });
+            if (item.is_memo_only) {
+                setOptimisticItems({ type: 'deleteItem', itemId: item.id });
+            } else {
+                setOptimisticItems({ type: 'checkItem', itemId: item.id });
+            }
             checkItemAction(item.id);
         });
     };
@@ -229,7 +233,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                                             className="h-12 w-12 p-0 rounded-full border-muted-foreground text-muted-foreground hover:bg-green-50 hover:text-green-500 hover:border-green-500"
                                             onClick={() => handleCheckLine(item)}
                                         >
-                                            <Circle className="h-6 w-6" />
+                                            <ShoppingCart className="h-5 w-5" />
                                         </Button>
                                     ) : (
                                         <Badge
