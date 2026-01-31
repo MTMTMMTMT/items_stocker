@@ -194,19 +194,18 @@ export async function logoutAction() {
     redirect('/login');
 }
 
-export async function updateItemAction(itemId: string, name: string, memo: string | null) {
+export async function updateItemAction(itemId: string, name: string, memo: string | null, category: string | null, is_shared: boolean) {
     const user = await import('./auth').then(m => m.getSession());
     if (!user) return { error: 'Unauthorized' };
 
     const db = await getDb();
 
-    // Verify ownership or group? For now, group based access is implicit if we assume all items in valid groups are editable.
-    // Ideally check group_id. But simplicity first.
-
     await db.update(items)
         .set({
             name,
             memo: memo || null,
+            category: category || '未分類',
+            is_shared: is_shared,
             updated_by: user.username,
             updated_at: new Date().toISOString()
         })

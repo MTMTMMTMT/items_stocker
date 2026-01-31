@@ -12,6 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // We need to mirror the Item type or import it
 type Item = {
@@ -29,24 +31,29 @@ interface EditItemDialogProps {
     item: Item | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onSubmit: (id: string, name: string, memo: string | null) => void;
+    onSubmit: (id: string, name: string, memo: string | null, category: string | null, is_shared: boolean) => void;
+    existingCategories: string[];
 }
 
-export function EditItemDialog({ item, open, onOpenChange, onSubmit }: EditItemDialogProps) {
+export function EditItemDialog({ item, open, onOpenChange, onSubmit, existingCategories }: EditItemDialogProps) {
     const [name, setName] = useState("");
     const [memo, setMemo] = useState("");
+    const [category, setCategory] = useState("");
+    const [isShared, setIsShared] = useState(true);
 
     useEffect(() => {
         if (item) {
             setName(item.name);
             setMemo(item.memo || "");
+            setCategory(item.category || "");
+            setIsShared(item.is_shared !== false); // Default logic
         }
     }, [item]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!item) return;
-        onSubmit(item.id, name, memo || null);
+        onSubmit(item.id, name, memo || null, category || null, isShared);
         onOpenChange(false);
     };
 
@@ -67,6 +74,27 @@ export function EditItemDialog({ item, open, onOpenChange, onSubmit }: EditItemD
                         />
                     </div>
                     <div className="space-y-2">
+                        <Label htmlFor="edit-category">カテゴリー</Label>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {existingCategories.map((cat) => (
+                                <Badge
+                                    key={cat}
+                                    variant="outline"
+                                    className="cursor-pointer hover:bg-secondary"
+                                    onClick={() => setCategory(cat)}
+                                >
+                                    {cat}
+                                </Badge>
+                            ))}
+                        </div>
+                        <Input
+                            id="edit-category"
+                            value={category}
+                            onChange={e => setCategory(e.target.value)}
+                            placeholder="カテゴリー"
+                        />
+                    </div>
+                    <div className="space-y-2">
                         <Label htmlFor="edit-memo">メモ</Label>
                         <Textarea
                             id="edit-memo"
@@ -74,8 +102,16 @@ export function EditItemDialog({ item, open, onOpenChange, onSubmit }: EditItemD
                             onChange={e => setMemo(e.target.value)}
                             placeholder="備考や詳細"
                             className="resize-none"
-                            rows={4}
+                            rows={3}
                         />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="edit-is-shared"
+                            checked={isShared}
+                            onCheckedChange={(c) => setIsShared(!!c)}
+                        />
+                        <Label htmlFor="edit-is-shared">家族と共有する</Label>
                     </div>
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

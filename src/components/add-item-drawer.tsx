@@ -16,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 // import { addItemAction } from '@/lib/actions'; // To be implemented
 
 // Mock action for now or I'll implement it in actions.ts next
@@ -76,27 +77,42 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="category">カテゴリー</Label>
+                            {/* Quick Select Badges */}
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                {existingCategories.map((cat) => (
+                                    <Badge
+                                        key={cat}
+                                        variant="outline"
+                                        className="cursor-pointer hover:bg-secondary"
+                                        onClick={() => {
+                                            const input = document.getElementById('category') as HTMLInputElement;
+                                            if (input) input.value = cat;
+                                        }}
+                                    >
+                                        {cat}
+                                    </Badge>
+                                ))}
+                            </div>
                             <Input
                                 id="category"
                                 name="category"
-                                placeholder="例: 食品"
-                                list="category-list"
+                                placeholder="例: 食品 (または上のタグを選択)"
                                 autoComplete="off"
                             />
-                            <datalist id="category-list">
-                                {existingCategories.map((cat, i) => (
-                                    <option key={i} value={cat} />
-                                ))}
-                            </datalist>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="memo">メモ</Label>
                             <Input id="memo" name="memo" placeholder="備考や詳細（任意）" />
                         </div>
-                        <div className="flex items-center space-x-2">
-                            {/* Checkbox handling in server actions requires 'on' value check */}
-                            <Checkbox id="is_memo_only" name="is_memo_only" value="true" />
-                            <Label htmlFor="is_memo_only">メモのみ（在庫管理しない）</Label>
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="is_shared" name="is_shared" defaultChecked={true} value="true" />
+                                <Label htmlFor="is_shared">家族と共有する</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="is_memo_only" name="is_memo_only" value="true" />
+                                <Label htmlFor="is_memo_only">メモのみ（在庫管理しない）</Label>
+                            </div>
                         </div>
 
                         <DrawerFooter>
@@ -109,7 +125,7 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                         </DrawerFooter>
                     </form>
                 </div>
-            </DrawerContent>
-        </Drawer>
+            </DrawerContent >
+        </Drawer >
     );
 }

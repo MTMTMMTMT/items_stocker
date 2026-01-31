@@ -44,12 +44,14 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
     const [optimisticItems, setOptimisticItems] = useOptimistic(
         initialItems,
         (state, action: {
-            type: 'updateStatus' | 'checkItem' | 'deleteItem' | 'toggleShouldBuy' | 'updateItemNameMemo';
+            type: 'updateStatus' | 'checkItem' | 'deleteItem' | 'toggleShouldBuy' | 'updateItemFull';
             itemId: string;
             newStatus?: number;
             newShouldBuy?: boolean;
             newName?: string;
             newMemo?: string | null;
+            newCategory?: string | null;
+            newIsShared?: boolean;
         }) => {
             switch (action.type) {
                 case 'updateStatus':
@@ -72,10 +74,16 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                             ? { ...item, should_buy: action.newShouldBuy! }
                             : item
                     );
-                case 'updateItemNameMemo':
+                case 'updateItemFull':
                     return state.map(item =>
                         item.id === action.itemId
-                            ? { ...item, name: action.newName!, memo: action.newMemo! }
+                            ? {
+                                ...item,
+                                name: action.newName!,
+                                memo: action.newMemo!,
+                                category: action.newCategory!,
+                                is_shared: action.newIsShared!
+                            }
                             : item
                     );
                 default:
@@ -144,10 +152,17 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
         });
     };
 
-    const handleUpdateItem = (id: string, name: string, memo: string | null) => {
+    const handleUpdateItem = (id: string, name: string, memo: string | null, category: string | null, is_shared: boolean) => {
         startTransition(() => {
-            setOptimisticItems({ type: 'updateItemNameMemo', itemId: id, newName: name, newMemo: memo });
-            updateItemAction(id, name, memo);
+            setOptimisticItems({
+                type: 'updateItemFull',
+                itemId: id,
+                newName: name,
+                newMemo: memo,
+                newCategory: category,
+                newIsShared: is_shared
+            });
+            updateItemAction(id, name, memo, category, is_shared);
         });
     };
 
@@ -264,6 +279,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                 open={!!editingItem}
                 onOpenChange={(open) => !open && setEditingItem(null)}
                 item={editingItem}
+                existingCategories={Array.from(new Set(initialItems.map(i => i.category || '未分類')))}
                 onSubmit={handleUpdateItem}
             />
         </div>
