@@ -128,7 +128,7 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                             <input type="hidden" name="is_memo_only" value={isMemoOnly ? "true" : "false"} />
                             <p className="text-[10px] text-muted-foreground">
                                 {!isMemoOnly
-                                    ? "在庫として管理します。なくなったら「購入リスト」に入れ、購入後はまた在庫に戻ります。"
+                                    ? "在庫として管理します。在庫がなくなったら自動で「買い物リスト」に入ります。"
                                     : "今回だけの買い物メモです。購入チェックをするとリストから消えます。"}
                             </p>
                         </div>
