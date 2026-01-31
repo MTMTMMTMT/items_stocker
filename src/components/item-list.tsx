@@ -3,7 +3,7 @@
 import { startTransition, useOptimistic, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, MoreHorizontal, Pencil, Trash } from 'lucide-react';
+import { Check, Circle, MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { toggleItemStatusAction, checkItemAction, deleteItemAction, toggleShouldBuyAction, updateItemAction } from '@/lib/actions';
 import { cn } from '@/lib/utils';
@@ -226,10 +226,10 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="h-12 w-12 p-0 rounded-full border-green-500 text-green-500 hover:bg-green-50"
+                                            className="h-12 w-12 p-0 rounded-full border-muted-foreground text-muted-foreground hover:bg-green-50 hover:text-green-500 hover:border-green-500"
                                             onClick={() => handleCheckLine(item)}
                                         >
-                                            <Check className="h-6 w-6" />
+                                            <Circle className="h-6 w-6" />
                                         </Button>
                                     ) : (
                                         <Badge
