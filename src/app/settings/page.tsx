@@ -47,7 +47,7 @@ export default async function SettingsPage() {
                 </section>
 
                 <div className="text-center text-xs text-muted-foreground pt-8">
-                    Desktop/Mobile PWA v0.1.0
+                    Items Stocker v1.0.0
                 </div>
             </div>
         </div>

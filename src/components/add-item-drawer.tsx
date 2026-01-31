@@ -74,7 +74,7 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                     <form onSubmit={handleSubmit} className="p-4 space-y-4 pb-48">
                         <div className="space-y-2">
                             <Label htmlFor="name">商品名</Label>
-                            <Input id="name" name="name" placeholder="例: 牛乳" required />
+                            <Input id="name" name="name" placeholder="例: 醤油" required />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="category">カテゴリー</Label>
@@ -97,7 +97,7 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                             <Input
                                 id="category"
                                 name="category"
-                                placeholder="例: 食品 (または上のタグを選択)"
+                                placeholder="例: 調味料 (または上のタグを選択)"
                                 autoComplete="off"
                             />
                         </div>
@@ -115,7 +115,6 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                                     onClick={() => setIsMemoOnly(false)}
                                 >
                                     在庫管理に追加
-                                    <span className="ml-1 text-[10px] opacity-80">(定番)</span>
                                 </Button>
                                 <Button
                                     type="button"
@@ -124,7 +123,6 @@ export function AddItemDrawer({ existingCategories = [] }: { existingCategories?
                                     onClick={() => setIsMemoOnly(true)}
                                 >
                                     買い物リストに追加
-                                    <span className="ml-1 text-[10px] opacity-80">(今回のみ)</span>
                                 </Button>
                             </div>
                             <input type="hidden" name="is_memo_only" value={isMemoOnly ? "true" : "false"} />
