@@ -3,6 +3,7 @@ import { logoutAction } from '@/lib/actions';
 import { getSession } from '@/lib/auth';
 import Link from 'next/link';
 import { ChevronLeft, LogOut } from 'lucide-react';
+import { ChangePasswordForm } from './change-password-form';
 
 export const runtime = 'edge';
 
@@ -38,6 +39,13 @@ export default async function SettingsPage() {
                 </section>
 
                 <section className="space-y-4">
+                    <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                        セキュリティ
+                    </h2>
+                    <ChangePasswordForm />
+                </section>
+
+                <section className="space-y-4">
                     <form action={logoutAction} className="w-full">
                         <Button variant="destructive" className="w-full justify-start space-x-2" size="lg">
                             <LogOut className="h-5 w-5" />
@@ -49,7 +57,7 @@ export default async function SettingsPage() {
                 <div className="text-center text-xs text-muted-foreground pt-8">
                     Items Stocker v1.0.0
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }

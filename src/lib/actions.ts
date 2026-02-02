@@ -250,14 +250,49 @@ export async function deleteUserAction(userId: string) {
     }
 
     const db = await getDb();
-    await db.delete(users).where(eq(users.id, userId));
 
-    // Also delete sessions? Cascade should handle if defined, but SQLite usually strictly needs generic delete.
-    // drizzle-orm schema doesn't define cascading logic in JS (it's DB side). 
-    // Let's explicitly delete sessions too to be clean.
+    // Delete sessions (child) first because of Foreign Key constraints
     const { sessions } = await import('../db/schema');
     await db.delete(sessions).where(eq(sessions.userId, userId));
 
+    // Then delete user (parent)
+    await db.delete(users).where(eq(users.id, userId));
+
     const { revalidatePath } = await import('next/cache');
     revalidatePath('/admin');
+}
+
+export async function changePasswordAction(prevState: any, formData: FormData) {
+    const user = await import('./auth').then(m => m.getSession());
+    if (!user) return { success: false, message: '', error: 'Unauthorized' };
+
+    const currentPassword = formData.get('currentPassword') as string;
+    const newPassword = formData.get('newPassword') as string;
+    const confirmPassword = formData.get('confirmPassword') as string;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        return { success: false, message: '', error: 'すべての項目を入力してください' };
+    }
+
+    if (newPassword !== confirmPassword) {
+        return { success: false, message: '', error: '新しいパスワードが一致しません' };
+    }
+
+    if (newPassword.length < 6) {
+        return { success: false, message: '', error: '新しいパスワードは6文字以上にしてください' };
+    }
+
+    // Verify current password
+    if (!(await verifyPassword(currentPassword, user.password_hash))) {
+        return { success: false, message: '', error: '現在のパスワードが間違っています' };
+    }
+
+    // Hash and update
+    const newHash = await hashPassword(newPassword);
+    const db = await getDb();
+    await db.update(users)
+        .set({ password_hash: newHash })
+        .where(eq(users.id, user.id));
+
+    return { success: true, message: 'パスワードを変更しました', error: '' };
 }
