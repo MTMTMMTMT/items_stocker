@@ -22,7 +22,7 @@ export function ChangePasswordForm() {
             <CardHeader>
                 <CardTitle className="text-base">パスワード変更</CardTitle>
                 <CardDescription>
-                    アカウントの安全性を保つため、定期的な変更をおすすめします。
+                    パスワードを変更します。現在のパスワードがわからない場合は開発者に連絡してください。
                 </CardDescription>
             </CardHeader>
             <form action={action}>

@@ -251,17 +251,22 @@ export async function deleteUserAction(userId: string) {
 
     const db = await getDb();
 
-    // 1. Delete sessions (child)
-    await db.delete(sessions).where(eq(sessions.userId, userId));
+    try {
+        // 1. Delete sessions (child)
+        await db.delete(sessions).where(eq(sessions.userId, userId));
 
-    // 2. Delete owned items (child - to prevent orphaned data)
-    await db.delete(items).where(eq(items.owner_id, userId));
+        // 2. Delete owned items (child - to prevent orphaned data)
+        await db.delete(items).where(eq(items.owner_id, userId));
 
-    // 3. Delete user (parent)
-    await db.delete(users).where(eq(users.id, userId));
+        // 3. Delete user (parent)
+        await db.delete(users).where(eq(users.id, userId));
 
-    const { revalidatePath } = await import('next/cache');
-    revalidatePath('/admin');
+        const { revalidatePath } = await import('next/cache');
+        revalidatePath('/admin');
+    } catch (e) {
+        console.error('Failed to delete user:', e);
+        return { error: 'ユーザーの削除に失敗しました' };
+    }
 }
 
 export async function changePasswordAction(prevState: any, formData: FormData) {
