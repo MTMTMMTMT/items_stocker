@@ -39,7 +39,7 @@ export function LoginForm() {
                             <p className="text-sm text-red-500">{loginState.error}</p>
                         )}
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="pt-4">
                         <Button type="submit" className="w-full" disabled={isLoginPending}>
                             {isLoginPending ? 'ログイン中...' : 'ログイン'}
                         </Button>
