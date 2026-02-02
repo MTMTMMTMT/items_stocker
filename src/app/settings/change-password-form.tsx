@@ -68,7 +68,7 @@ export function ChangePasswordForm() {
                         />
                     </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="pt-6">
                     <Button type="submit" disabled={isPending}>
                         {isPending ? '変更中...' : 'パスワードを変更'}
                     </Button>
