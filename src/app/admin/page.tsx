@@ -11,19 +11,31 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { AdminRegisterForm } from './register-form';
-import { Button } from '@/components/ui/button';
-import { Trash } from 'lucide-react';
-import { deleteUserAction } from '@/lib/actions';
+import { UserDeleteButton } from './user-delete-button';
 
 export const runtime = 'edge';
 
 export default async function AdminPage() {
-    const db = await getDb();
-    const allUsers = await db.select().from(users).all();
+    let allUsers: typeof users.$inferSelect[] = [];
+    let error = null;
+
+    try {
+        const db = await getDb();
+        allUsers = await db.select().from(users).all();
+    } catch (e) {
+        console.error('Failed to fetch users:', e);
+        error = 'ユーザー情報の取得に失敗しました。';
+    }
 
     return (
         <div className="p-8 max-w-4xl mx-auto space-y-8">
             <h1 className="text-2xl font-bold">管理画面</h1>
+
+            {error && (
+                <div className="bg-destructive/15 text-destructive p-4 rounded-md">
+                    {error}
+                </div>
+            )}
 
             <div className="grid gap-8 md:grid-cols-2">
                 <Card>
@@ -45,14 +57,7 @@ export default async function AdminPage() {
                                         <TableCell className="font-medium">{user.username}</TableCell>
                                         <TableCell>{user.group_id}</TableCell>
                                         <TableCell>
-                                            <form action={async () => {
-                                                'use server';
-                                                await deleteUserAction(user.id);
-                                            }}>
-                                                <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50">
-                                                    <Trash className="h-4 w-4" />
-                                                </Button>
-                                            </form>
+                                            <UserDeleteButton userId={user.id} />
                                         </TableCell>
                                     </TableRow>
                                 ))}
