@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { getDb } from '../db';
 import { users, items, sessions } from '../db/schema';
 import { hashPassword, verifyPassword, createSession, logout as logoutAuth } from './auth';
-import { eq } from 'drizzle-orm';
+import { eq, count } from 'drizzle-orm';
 import { z } from 'zod';
 
 // ... authSchema ... (kept for brevity in thought but removal in file)
@@ -78,6 +78,15 @@ export async function addItemAction(prevState: any, formData: FormData) {
     let initialStatus = 0;
     if (is_memo_only === 'true' || add_to_shopping_list === 'true') {
         initialStatus = 3; // Empty/Need to buy
+    }
+
+    // Demo Account Restriction
+    if (user.username === 'demo') {
+        const result = await db.select({ count: count() }).from(items).where(eq(items.owner_id, user.id));
+        const currentCount = result[0]?.count ?? 0;
+        if (currentCount >= 6) {
+            return { error: 'デモアカウントであるためこれ以上追加できません' };
+        }
     }
 
     await db.insert(items).values({
@@ -272,6 +281,11 @@ export async function deleteUserAction(userId: string) {
 export async function changePasswordAction(prevState: any, formData: FormData) {
     const user = await import('./auth').then(m => m.getSession());
     if (!user) return { success: false, message: '', error: 'Unauthorized' };
+
+    // Demo Account Restriction
+    if (user.username === 'demo') {
+        return { success: false, message: '', error: 'デモアカウントのパスワードは変更できません' };
+    }
 
     const currentPassword = formData.get('currentPassword') as string;
     const newPassword = formData.get('newPassword') as string;
