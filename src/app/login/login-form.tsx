@@ -49,7 +49,7 @@ export function LoginForm() {
 
             <div className="text-center text-sm text-muted-foreground">
                 <p className="mb-2 font-medium">デモアカウントで体験</p>
-                <div className="bg-muted/50 p-4 rounded-lg space-y-1 text-xs inline-block text-left border">
+                <div className="bg-muted/50 p-4 rounded-lg space-y-3 text-xs inline-block text-left border w-full">
                     <div className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-1">
                         <span>家族ID:</span>
                         <span className="font-mono font-medium">family-demo</span>
@@ -58,6 +58,19 @@ export function LoginForm() {
                         <span>パスワード:</span>
                         <span className="font-mono font-medium">demo1234</span>
                     </div>
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        className="w-full"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            (document.getElementById('group_id') as HTMLInputElement).value = 'family-demo';
+                            (document.getElementById('username') as HTMLInputElement).value = 'demo';
+                            (document.getElementById('password') as HTMLInputElement).value = 'demo1234';
+                        }}
+                    >
+                        自動入力する
+                    </Button>
                 </div>
             </div>
         </div>
