@@ -61,7 +61,7 @@ export function EditItemDialog({ item, open, onOpenChange, onSubmit, existingCat
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md" onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>アイテムを編集</DialogTitle>
                 </DialogHeader>

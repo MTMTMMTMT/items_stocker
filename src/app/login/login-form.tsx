@@ -15,7 +15,7 @@ export function LoginForm() {
     const [loginState, formLoginAction, isLoginPending] = useActionState(loginAction, initialState);
 
     return (
-        <div className="w-full max-w-md p-4">
+        <div className="w-full max-w-md p-4 space-y-6">
             <Card>
                 <CardHeader>
                     <CardTitle>おかえりなさい</CardTitle>
@@ -46,6 +46,20 @@ export function LoginForm() {
                     </CardFooter>
                 </form>
             </Card>
+
+            <div className="text-center text-sm text-muted-foreground">
+                <p className="mb-2 font-medium">デモアカウントで体験</p>
+                <div className="bg-muted/50 p-4 rounded-lg space-y-1 text-xs inline-block text-left border">
+                    <div className="grid grid-cols-[auto,1fr] gap-x-4 gap-y-1">
+                        <span>家族ID:</span>
+                        <span className="font-mono font-medium">family-demo</span>
+                        <span>ユーザー名:</span>
+                        <span className="font-mono font-medium">demo</span>
+                        <span>パスワード:</span>
+                        <span className="font-mono font-medium">demo1234</span>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
