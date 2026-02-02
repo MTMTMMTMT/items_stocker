@@ -85,7 +85,7 @@ export async function addItemAction(prevState: any, formData: FormData) {
         category: category || '未分類',
         memo: memo || null,
         status: initialStatus,
-        is_shared: is_shared !== 'false', // Default to true if not specified? Or checkbox logic. Let's assume default checked in UI.
+        is_shared: is_shared === 'true', // Checkbox checked="true", unchecked=undefined(false)
         is_memo_only: is_memo_only === 'true',
         owner_id: user.id,
         group_id: user.group_id,
