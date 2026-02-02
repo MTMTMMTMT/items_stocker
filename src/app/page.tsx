@@ -3,7 +3,7 @@ import { getDb } from '@/db';
 import { items } from '@/db/schema';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
-import { eq } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
 import { ItemList } from '@/components/item-list';
 import { AddItemDrawer } from '@/components/add-item-drawer';
 import { LogOut } from 'lucide-react';
@@ -23,7 +23,16 @@ export default async function DashboardPage() {
   let userItems: any[] = [];
 
   if (user.group_id) {
-    userItems = await db.select().from(items).where(eq(items.group_id, user.group_id)).all();
+    userItems = await db.select().from(items)
+      .where(
+        and(
+          eq(items.group_id, user.group_id),
+          or(
+            eq(items.is_shared, true),
+            eq(items.owner_id, user.id)
+          )
+        )
+      ).all();
   } else {
     userItems = await db.select().from(items).where(eq(items.owner_id, user.id)).all();
   }

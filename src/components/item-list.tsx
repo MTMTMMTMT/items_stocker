@@ -29,10 +29,11 @@ type Item = {
 // Status Utils
 const STATUS_COLORS = {
     0: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 hover:bg-green-200',
-    1: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 hover:bg-yellow-200',
-    2: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200',
+    1: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 hover:bg-yellow-200', // Low (Safe)
+    2: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 hover:bg-orange-200', // Low (Urgent)
+    3: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 hover:bg-red-200', // Empty
 };
-const STATUS_LABELS = { 0: '在庫あり', 1: '少なめ', 2: 'なし' };
+const STATUS_LABELS = { 0: '在庫あり', 1: '少なめ', 2: 'そろそろ', 3: 'なし' };
 
 export function ItemList({ initialItems }: { initialItems: Item[] }) {
     const searchParams = useSearchParams();
@@ -98,7 +99,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
     const displayedItems = optimisticItems.filter(item => {
         // 1. View Mode Filter
         if (view === 'shopping') {
-            if (item.status === 0) return false;
+            if (item.status < 2) return false;
             // Hide if stop repurchasing is active (should_buy is false)
             if (item.should_buy === false) return false;
             return true;
@@ -124,7 +125,7 @@ export function ItemList({ initialItems }: { initialItems: Item[] }) {
     }, {} as Record<string, Item[]>);
 
     const handleStatusToggle = (item: Item) => {
-        const nextStatus = (item.status + 1) % 3;
+        const nextStatus = (item.status + 1) % 4;
         startTransition(() => {
             setOptimisticItems({ type: 'updateStatus', itemId: item.id, newStatus: nextStatus });
             toggleItemStatusAction(item.id, item.status);

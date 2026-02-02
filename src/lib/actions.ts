@@ -77,7 +77,7 @@ export async function addItemAction(prevState: any, formData: FormData) {
     // default -> status 0 (Plenty)
     let initialStatus = 0;
     if (is_memo_only === 'true' || add_to_shopping_list === 'true') {
-        initialStatus = 2; // Empty/Need to buy
+        initialStatus = 3; // Empty/Need to buy
     }
 
     await db.insert(items).values({
@@ -149,9 +149,9 @@ export async function toggleItemStatusAction(itemId: string, currentStatus: numb
 
     const db = await getDb();
 
-    // Logic: 0 -> 1 -> 2 -> 0 (loop in stock mode?)
-    // Or: Plenty(0) -> Low(1) -> Empty(2) -> Plenty(0)
-    const nextStatus = (currentStatus + 1) % 3;
+    // Logic: 0 -> 1 -> 2 -> 3 -> 0
+    // 0: Plenty, 1: Low(Safe), 2: Low(Urgent), 3: Empty
+    const nextStatus = (currentStatus + 1) % 4;
 
     await db.update(items)
         .set({ status: nextStatus, updated_by: user.username, updated_at: new Date().toISOString() }) // Use params or sql? drizzle handles date? using string for text column
