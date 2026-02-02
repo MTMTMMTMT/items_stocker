@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { getDb } from '../db';
-import { users, items } from '../db/schema';
+import { users, items, sessions } from '../db/schema';
 import { hashPassword, verifyPassword, createSession, logout as logoutAuth } from './auth';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
@@ -251,11 +251,13 @@ export async function deleteUserAction(userId: string) {
 
     const db = await getDb();
 
-    // Delete sessions (child) first because of Foreign Key constraints
-    const { sessions } = await import('../db/schema');
+    // 1. Delete sessions (child)
     await db.delete(sessions).where(eq(sessions.userId, userId));
 
-    // Then delete user (parent)
+    // 2. Delete owned items (child - to prevent orphaned data)
+    await db.delete(items).where(eq(items.owner_id, userId));
+
+    // 3. Delete user (parent)
     await db.delete(users).where(eq(users.id, userId));
 
     const { revalidatePath } = await import('next/cache');

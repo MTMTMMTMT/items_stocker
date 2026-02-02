@@ -3,7 +3,7 @@
 家族やグループで共有できる、シンプルな在庫管理 & 買い物リストアプリです。
 PWA (Progressive Web App) 対応のため、スマートフォンからもアプリ感覚で利用できます。
 
-## 🔹 特徴
+## 特徴
 
 - **2つのビュー**: 「在庫管理」と「買い物リスト」を切り替えて使えます。
 - **4段階のステータス**: 在庫状況を細かく管理できます。
@@ -13,7 +13,7 @@ PWA (Progressive Web App) 対応のため、スマートフォンからもアプ
 
 ---
 
-## 📱 使い方
+## 使い方
 
 ### 1. ステータスの見方
 アイテムの横にあるボタンをタップすると、以下の順でステータスが切り替わります。
@@ -38,7 +38,7 @@ PWA (Progressive Web App) 対応のため、スマートフォンからもアプ
 
 ---
 
-## 🛠 技術スタック
+## 技術スタック
 
 - **Framework**: Next.js 15 (App Router)
 - **Database**: Cloudflare D1 (SQLite)
@@ -46,7 +46,7 @@ PWA (Progressive Web App) 対応のため、スマートフォンからもアプ
 - **UI**: Shadcn/UI, Tailwind CSS, Lucide Icons
 - **Deployment**: Cloudflare Pages
 
-## 🚀 デプロイ方法 (開発者向け)
+## デプロイ方法 (開発者向け)
 
 ### セットアップ
 ```bash
