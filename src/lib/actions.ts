@@ -239,3 +239,25 @@ export async function deleteItemAction(itemId: string) {
     revalidatePath('/');
     return { success: true };
 }
+
+export async function deleteUserAction(userId: string) {
+    const user = await import('./auth').then(m => m.getSession());
+    if (!user) return { error: 'Unauthorized' };
+
+    // Self-deletion check (optional but good UI)
+    if (user.id === userId) {
+        return { error: '自分自身は削除できません' };
+    }
+
+    const db = await getDb();
+    await db.delete(users).where(eq(users.id, userId));
+
+    // Also delete sessions? Cascade should handle if defined, but SQLite usually strictly needs generic delete.
+    // drizzle-orm schema doesn't define cascading logic in JS (it's DB side). 
+    // Let's explicitly delete sessions too to be clean.
+    const { sessions } = await import('../db/schema');
+    await db.delete(sessions).where(eq(sessions.userId, userId));
+
+    const { revalidatePath } = await import('next/cache');
+    revalidatePath('/admin');
+}

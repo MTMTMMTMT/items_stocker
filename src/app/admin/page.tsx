@@ -11,6 +11,9 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { AdminRegisterForm } from './register-form';
+import { Button } from '@/components/ui/button';
+import { Trash } from 'lucide-react';
+import { deleteUserAction } from '@/lib/actions';
 
 export const runtime = 'edge';
 
@@ -33,6 +36,7 @@ export default async function AdminPage() {
                                 <TableRow>
                                     <TableHead>ユーザー名</TableHead>
                                     <TableHead>家族ID</TableHead>
+                                    <TableHead className="w-[50px]"></TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -40,6 +44,16 @@ export default async function AdminPage() {
                                     <TableRow key={user.id}>
                                         <TableCell className="font-medium">{user.username}</TableCell>
                                         <TableCell>{user.group_id}</TableCell>
+                                        <TableCell>
+                                            <form action={async () => {
+                                                'use server';
+                                                await deleteUserAction(user.id);
+                                            }}>
+                                                <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 hover:bg-red-50">
+                                                    <Trash className="h-4 w-4" />
+                                                </Button>
+                                            </form>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
