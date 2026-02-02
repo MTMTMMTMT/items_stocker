@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Items Stocker
 
-## Getting Started
+家族やグループで共有できる、シンプルな在庫管理 & 買い物リストアプリです。
+PWA (Progressive Web App) 対応のため、スマートフォンからもアプリ感覚で利用できます。
 
-First, run the development server:
+## 🔹 特徴
 
+- **2つのビュー**: 「在庫管理」と「買い物リスト」を切り替えて使えます。
+- **4段階のステータス**: 在庫状況を細かく管理できます。
+- **リアルタイム共有**: 家族IDを共有すれば、複数端末で在庫状況が即座に同期されます。
+- **プライベートモード**: 家族には見せたくないアイテム（自分専用のお菓子など）は「自分のみ」に設定可能。
+- **カテゴリ分類**: タグ付けで整理整頓。買い物中は売り場ごとにフィルタリングできます。
+
+---
+
+## 📱 使い方
+
+### 1. ステータスの見方
+アイテムの横にあるボタンをタップすると、以下の順でステータスが切り替わります。
+
+| ステータス | 色 | 意味 | 買い物リストへの表示 |
+| --- | --- | --- | --- |
+| **在庫あり** | 🟢 緑 | たくさんある。心配なし。 | 表示されない |
+| **少なめ** | 🟡 黄 | 減ってきたが、まだ買わなくてOK。 | 表示されない |
+| **そろそろ** | 🟠 橙 | もうすぐ無くなる。**買うべき**。 | **表示される** |
+| **なし** | 🔴 赤 | 完全に在庫切れ。**買うべき**。 | **表示される** |
+
+### 2. アイテムの追加
+画面右下の「＋」ボタンから追加できます。
+
+- **在庫管理に追加**: 定期的に買うもの（牛乳、洗剤など）。
+- **買い物リストに追加**: 今回だけ必要なもの（イベント用の材料など）。買うとリストから消えます。
+- **自分のみ (Private)**: チェックを外すと、他の家族からは見えなくなります。
+
+### 3. 買い物リストモード
+画面下の「買い物」タブをタップすると、**「そろそろ(橙)」** または **「なし(赤)」** のアイテムだけが表示されます。
+カートボタン 🛒 を押すと、「購入済み」となり、在庫ステータスが「在庫あり(緑)」に戻ります。
+
+---
+
+## 🛠 技術スタック
+
+- **Framework**: Next.js 15 (App Router)
+- **Database**: Cloudflare D1 (SQLite)
+- **ORM**: Drizzle ORM
+- **UI**: Shadcn/UI, Tailwind CSS, Lucide Icons
+- **Deployment**: Cloudflare Pages
+
+## 🚀 デプロイ方法 (開発者向け)
+
+### セットアップ
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### ローカル開発
+```bash
+npm run dev
+# D1のエミュレーションが必要な場合は
+npm run pages:dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### デプロイ (Cloudflare Pages)
+GitHubリポジトリにプッシュすると、Cloudflare Pagesが自動でビルド・デプロイします。
+手動でデプロイする場合は以下：
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run pages:build
+npx wrangler pages deploy .vercel/output/static
+```
 
-## Learn More
+### データベース更新 (Drizzle)
+スキーマを変更した場合：
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run db:generate
+npm run db:migrate:local # ローカル
+npm run db:migrate:prod # 本番環境
+```
